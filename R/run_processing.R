@@ -1,22 +1,17 @@
-library(MALDIquant)
-library(MALDIquantForeign)
-library(ggplot2)
-
-
 # =================================================== #
 # ===== MAIN FUNCTION =============================== #
 # =================================================== #
 
 run_processing <- function (FILE, CLEAVAGE = "Trypsin", KERATIN = TRUE, TAG = NULL, EXCLUDE = c(), SNR = 30, PEAKS = c(30, 10), PLOTS = TRUE, TRANSFORM = "sqrt", SMOOTH = c("SavitzkyGolay", 10), BASELINE = c("SNIP", 100), CALIBRATE = "TIC"){
   # read file(s)
-  raw_spectrum <- import(FILE)
+  raw_spectrum <- MALDIquantForeign::import(FILE)
   
   # preprossessing
   preprocessed_spectrum <- raw_spectrum |>
-    transformIntensity(method = TRANSFORM) |> # Reduce dominance of very large peaks with square root scaling
-    smoothIntensity(method = SMOOTH[1], halfWindowSize = as.numeric(SMOOTH[2])) |> # Reduce noise while preserving peak shape
-    removeBaseline(method = BASELINE[1], iterations = as.numeric(BASELINE[2])) |> # Remove baseline with iterative clipping algorithm
-    calibrateIntensity(method = CALIBRATE) # Calibrate with total ion current normalization
+    MALDIquant::transformIntensity(method = TRANSFORM) |> # Reduce dominance of very large peaks with square root scaling
+    MALDIquant::smoothIntensity(method = SMOOTH[1], halfWindowSize = as.numeric(SMOOTH[2])) |> # Reduce noise while preserving peak shape
+    MALDIquant::removeBaseline(method = BASELINE[1], iterations = as.numeric(BASELINE[2])) |> # Remove baseline with iterative clipping algorithm
+    MALDIquant::calibrateIntensity(method = CALIBRATE) # Calibrate with total ion current normalization
   
   # processing
   ## initialize
@@ -81,14 +76,14 @@ run_processing <- function (FILE, CLEAVAGE = "Trypsin", KERATIN = TRUE, TAG = NU
   ## loop
   while (number_peaks < min_peaks || number_peaks > max_peaks){
     ### detect peaks
-    peaks <- detectPeaks(
+    peaks <- MALDIquant::detectPeaks(
       preprocessed_spectrum,
       SNR = sigal_noise_ratio,
       halfWindowSize = 20 # ?????
     )
     ### remove contaminants (protease, keratin, tag)
-    peaks_mz <- mass(peaks[[1]])
-    peaks_int <- intensity(peaks[[1]])
+    peaks_mz <- MALDIquant::mass(peaks[[1]])
+    peaks_int <- MALDIquant::intensity(peaks[[1]])
     #### detect matches
     tolerance <- 2
     
@@ -335,58 +330,58 @@ run_processing <- function (FILE, CLEAVAGE = "Trypsin", KERATIN = TRUE, TAG = NU
   
   # Plots
   ## Plot Raw Data
-  plot_raw_data <- data.frame(mz = mass(raw_spectrum[[1]]), intensity = intensity(raw_spectrum[[1]]))
+  plot_raw_data <- data.frame(mz = MALDIquant::mass(raw_spectrum[[1]]), intensity = MALDIquant::intensity(raw_spectrum[[1]]))
   
-  plot_raw <- ggplot(data = plot_raw_data, aes(x = mz, y =  intensity)) + 
-    geom_line() +
-    scale_y_continuous(limits = c(0, max(intensity(raw_spectrum[[1]])))) +
-    labs(
+  plot_raw <- ggplot2::ggplot(data = plot_raw_data, ggplot2::aes(x = mz, y =  intensity)) + 
+    ggplot2::geom_line() +
+    ggplot2::scale_y_continuous(limits = c(0, max(MALDIquant::intensity(raw_spectrum[[1]])))) +
+    ggplot2::labs(
       x = "m/z",
       y = "intensity",
       title = "Raw Spectrum"
     ) +
-    theme_classic()
+    ggplot2::theme_classic()
   
   ## Plot Preprocessed Data
-  plot_preprocessed_data <- data.frame(mz = mass(preprocessed_spectrum[[1]]), intensity = intensity(preprocessed_spectrum[[1]]))
+  plot_preprocessed_data <- data.frame(mz = MALDIquant::mass(preprocessed_spectrum[[1]]), intensity = MALDIquant::intensity(preprocessed_spectrum[[1]]))
 
-  plot_preprocessed <- ggplot(data = plot_preprocessed_data, aes(x = mz, y =  intensity)) + 
-    geom_line() +
-    scale_y_continuous(limits = c(0, max(intensity(preprocessed_spectrum[[1]])))) +
-    labs(
+  plot_preprocessed <- ggplot2::ggplot(data = plot_preprocessed_data, ggplot2::aes(x = mz, y =  intensity)) + 
+    ggplot2::geom_line() +
+    ggplot2::scale_y_continuous(limits = c(0, max(MALDIquant::intensity(preprocessed_spectrum[[1]])))) +
+    ggplot2::labs(
       x = "m/z",
       y = "intensity",
       title = "Preprocessed Spectrum"
     ) +
-    theme_classic()
+    ggplot2::theme_classic()
   
   ## Plot Detected Peaks
   plot_peaks_data <- data.frame(peaks = peaks_mz_clean, intensity = peaks_int_clean)
   
-  plot_peaks <- ggplot(data = plot_preprocessed_data, aes(x = mz, y =  intensity)) + 
-    geom_line() +
-    geom_point(data = plot_peaks_data, aes(x = peaks, y = intensity), color = "lightblue4") +
-    scale_y_continuous(limits = c(0, max(intensity(preprocessed_spectrum[[1]])))) +
-    labs(
+  plot_peaks <- ggplot2::ggplot(data = plot_preprocessed_data, ggplot2::aes(x = mz, y =  intensity)) + 
+    ggplot2::geom_line() +
+    ggplot2::geom_point(data = plot_peaks_data, ggplot2::aes(x = peaks, y = intensity), color = "lightblue4") +
+    ggplot2::scale_y_continuous(limits = c(0, max(MALDIquant::intensity(preprocessed_spectrum[[1]])))) +
+    ggplot2::labs(
       x = "m/z",
       y = "intensity",
       title = "Preprocessed Spectrum"
     ) +
-    theme_classic()
+    ggplot2::theme_classic()
   
   ## Plot Detected Peaks Clean Mono
   plot_peaks_mono_data <- data.frame(peaks = peaks_mz_clean_mono, intensity = peaks_int_clean_mono)
   
-  plot_peaks_mono <- ggplot(data = plot_preprocessed_data, aes(x = mz, y =  intensity)) + 
-    geom_line() +
-    geom_point(data = plot_peaks_mono_data, aes(x = peaks, y = intensity), color = "red") +
-    scale_y_continuous(limits = c(0, max(intensity(preprocessed_spectrum[[1]])))) +
-    labs(
+  plot_peaks_mono <- ggplot2::ggplot(data = plot_preprocessed_data, ggplot2::aes(x = mz, y =  intensity)) + 
+    ggplot2::geom_line() +
+    ggplot2::geom_point(data = plot_peaks_mono_data, ggplot2::aes(x = peaks, y = intensity), color = "red") +
+    ggplot2::scale_y_continuous(limits = c(0, max(MALDIquant::intensity(preprocessed_spectrum[[1]])))) +
+    ggplot2::labs(
       x = "m/z",
       y = "intensity",
       title = "Detected Monoisotopic Peaks For the Target Protein "
     ) +
-    theme_classic()
+    ggplot2::theme_classic()
   
   ## Plot Detected Peaks Clean Mono and Contaminants 
   plot_peaks_cleavage_mono <- data.frame(peaks = peaks_mz_clean_cleavage_mono, intensity = peaks_int_clean_cleavage_mono)
@@ -394,14 +389,14 @@ run_processing <- function (FILE, CLEAVAGE = "Trypsin", KERATIN = TRUE, TAG = NU
   plot_peaks_tag_mono <- data.frame(peaks = peaks_mz_clean_tag_mono, intensity = peaks_int_clean_tag_mono)
   plot_peaks_custom_mono <- data.frame(peaks = peaks_mz_clean_custom_mono, intensity = peaks_int_clean_custom_mono)
   
-  plot_peaks_mono_contaminants <- ggplot(data = plot_preprocessed_data, aes(x = mz, y =  intensity)) + 
-    geom_line() +
-    geom_point(data = plot_peaks_mono_data, aes(x = peaks, y = intensity, color = "Target")) +
-    geom_point(data = plot_peaks_cleavage_mono, aes(x = peaks, y = intensity, color = "Cleavage")) +
-    geom_point(data = plot_peaks_keratin_mono, aes(x = peaks, y = intensity, color = "Keratin")) +
-    geom_point(data = plot_peaks_tag_mono, aes(x = peaks, y = intensity, color = "Tag")) +
-    geom_point(data = plot_peaks_custom_mono, aes(x = peaks, y = intensity, color = "Custom")) +
-    scale_color_manual(
+  plot_peaks_mono_contaminants <- ggplot2::ggplot(data = plot_preprocessed_data, ggplot2::aes(x = mz, y =  intensity)) + 
+    ggplot2::geom_line() +
+    ggplot2::geom_point(data = plot_peaks_mono_data, ggplot2::aes(x = peaks, y = intensity, color = "Target")) +
+    ggplot2::geom_point(data = plot_peaks_cleavage_mono, ggplot2::aes(x = peaks, y = intensity, color = "Cleavage")) +
+    ggplot2::geom_point(data = plot_peaks_keratin_mono, ggplot2::aes(x = peaks, y = intensity, color = "Keratin")) +
+    ggplot2::geom_point(data = plot_peaks_tag_mono, ggplot2::aes(x = peaks, y = intensity, color = "Tag")) +
+    ggplot2::geom_point(data = plot_peaks_custom_mono, ggplot2::aes(x = peaks, y = intensity, color = "Custom")) +
+    ggplot2::scale_color_manual(
       name = "Peak Type",
       values = c(
         "Target" = "red",
@@ -411,13 +406,13 @@ run_processing <- function (FILE, CLEAVAGE = "Trypsin", KERATIN = TRUE, TAG = NU
         "Custom" = "purple"
       )
     ) +
-    scale_y_continuous(limits = c(0, max(intensity(preprocessed_spectrum[[1]])))) +
-    labs(
+    ggplot2::scale_y_continuous(limits = c(0, max(MALDIquant::intensity(preprocessed_spectrum[[1]])))) +
+    ggplot2::labs(
       x = "m/z",
       y = "intensity",
       title = "Detected Monoisotopic Peaks For the Target Protein and the Removed Contaminants"
     ) +
-    theme_classic()
+    ggplot2::theme_classic()
   
   # return
   # TODO: change returnvalue according to agruments

@@ -15,6 +15,7 @@ Description: This package provides tools for preprocessing MALDI mass spectromet
     generating spectrum plots, and optionally submitting peptide mass fingerprinting 
     data to Mascot, MS-Fit, and MS-Digest services for automated analysis.
 URL: https://github.com/SpikeMurphy/MassSpectFPAutoTool
+VideoDemo: https://www.youtube.com/watch?v=YOUR_VIDEO_ID
 BugReports: https://github.com/SpikeMurphy/MassSpectFPAutoTool/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
