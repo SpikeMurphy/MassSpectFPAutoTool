@@ -17,6 +17,37 @@ The package is designed to streamline analysis pipelines from raw spectra to pro
 
 ------------------------------------------------------------------------
 
+## Table of Contents
+
+-   [About the Project](#about-the-project)
+-   [Motivation & Scope](#motivation--scope)
+-   [Key Features](#key-features)
+-   [Usage Overview](#usage-overview)
+-   [Use in Academia](#use-in-academia)
+-   [Technology Stack](#technology-stack)
+-   [Application Architecture](#application-architecture)
+-   [Included Files](#included-files)
+-   [Installation (Users)](#installation-users)
+-   [Installation (Developers / Build Process)](#installation-developers--build-process)
+-   [Version History](#version-history)
+-   [Acknowledgements](#acknowledgements)
+-   [Licensing](#licensing)
+-   [Disclaimer](#disclaimer)
+-   [Distribution](#distribution)
+-   [Contact](#contact)
+
+------------------------------------------------------------------------
+
+## Motivation behind the project
+
+The current standard in academia for analysing peptide mass fingerprinting (PMF) data is the Matrix Science Mascot server. However, before submission, raw data must first be converted into peak lists of mass-to-charge ratio (m/z) values that are compatible with the Mascot PMF workflow. Typically, software such as mMass is used for this purpose, but many of these tools are not readily available on Apple devices.
+
+This R package aims to provide basic PMF data processing functionality in an accessible and platform-independent way, particularly for users working on Apple systems. While the package is currently best suited for simple PMF analyses, it may not yet be the optimal choice for highly complex or ambiguous datasets.
+
+Nevertheless, this project represents an important first step toward broadening platform accessibility for PMF analysis and may be expanded with additional features in the future.
+
+------------------------------------------------------------------------
+
 ## Features
 
 -   Preprocessing of MALDI spectra using `MALDIquant`
@@ -49,7 +80,8 @@ The package is designed to streamline analysis pipelines from raw spectra to pro
 You can install the development version from GitHub:
 
 ``` {#install .r .installation}
-# install.packages("devtools")
+install.packages("devtools")
+library("devtools")
 devtools::install_github("SpikeMurphy/MassSpectFPAutoTool")
 ```
 
@@ -66,7 +98,7 @@ library(msfingerprint)
 ### 2. Processing Spectrum
 
 ``` {#run_processing .r .function}
-result <- run_processing(FILE = "~/dir/example.mzML")
+result <- run_processing(FILE = "~/dir/example.mzXML")
 ```
 
 ### 3. Accessing Results
@@ -194,24 +226,73 @@ search_msdigest(
 
 ------------------------------------------------------------------------
 
-## Output
+## Input
 
-The main function returns:
+The main function `run_processing` takes:
 
--   Clean monoisotopic peaks
-    -   Target protein peaks
-    -   Restriction enzyme autolysis peaks
-    -   Keratin contamination peaks
-    -   Custom peaklist matches
--   Multiple `ggplot2` visualizations
-    -   Raw spectrum
-    -   Preprocessed spectrum
-    -   Plot with detected monoisotopic and isotopic peaks for the target protein
-    -   Plot with detected monoisotopic peaks for the target protein
-    -   Plot with detected monoisotopic peaks for the target protein and the contaminants
+-   MS files:
+    -   Tested on `msXML` file format [example.mzXML](inst/extdata/example.mzXML)
+    -   Also supported `msmzML` & `imzML`
+
+Database search functions take:
+
+-   Peaklist searches against databases
+    -   Numeric vector from any source
 
 ``` r
-file <- system.file("extdata", "example.mzML", package = "msfingerprint")
+c(
+  909.487988195952, 924.537239357999, 1100.69825492272, 1122.67765717953,
+  1128.2313884941, 1138.65099138298, 1169.58360432486, 1183.56229951438, 
+  1295.66409038798, 1311.65393427144, 1331.70699847362, 1377.70333719367,
+  1393.69929612912, 1399.69294364312, 1411.7616927402, 1415.66206248727,
+  1450.78305528263, 1646.90824317882, 1662.89452290811, 1768.91735775239,
+  1810.92290814297, 1823.91341791192, 1839.92654612077, 1946.96565258623,
+  2225.09583098386, 3037.87500575276
+)
+```
+
+------------------------------------------------------------------------
+
+## Output
+
+The main function `run_processing` returns:
+
+-   Clean monoisotopic peaks
+
+    -   Target protein peaks
+
+        ``` r
+        c(
+          909.487988195952, 924.537239357999, 1100.69825492272, 1122.67765717953,
+          1128.2313884941, 1138.65099138298, 1169.58360432486, 1183.56229951438, 
+          1295.66409038798, 1311.65393427144, 1331.70699847362, 1377.70333719367,
+          1393.69929612912, 1399.69294364312, 1411.7616927402, 1415.66206248727,
+          1450.78305528263, 1646.90824317882, 1662.89452290811, 1768.91735775239,
+          1810.92290814297, 1823.91341791192, 1839.92654612077, 1946.96565258623,
+          2225.09583098386, 3037.87500575276
+        )
+        ```
+
+-   Restriction enzyme autolysis peaks
+
+-   Keratin contamination peaks
+
+-   Custom peaklist matches
+
+-   Multiple `ggplot2` visualizations
+
+    -   Raw spectrum ![Example figure](man/figures/raw_spectrum.png)
+
+    -   Preprocessed spectrum ![Example figure](man/figures/processed_spectrum.png)
+
+    -   Plot with detected monoisotopic and isotopic peaks for the target protein ![Example figure](man/figures/peaks_spectrum.png)
+
+    -   Plot with detected monoisotopic peaks for the target protein ![Example figure](man/figures/mono_peaks_spectrum.png)
+
+    -   Plot with detected monoisotopic peaks for the target protein and the contaminants ![Example figure](man/figures/mono_cont_peaks_spectrum.png)
+
+``` r
+file <- system.file("extdata", "example.mzXML", package = "msfingerprint")
 
 result <- run_processing(FILE = file)
 

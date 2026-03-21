@@ -1,21 +1,4 @@
 # TODO: go through website HTML and orter arguments and local html
-# TODO: CONSTMODS/VARMODS multiple? -> turn to c()?
-# TODO: ->
-
-# Create HTML inputs for contant modifications (CONSTMODS) ->
-# const_mods_html <- if (length(VARMODS) > 0) {
-#   paste0('<input type="hidden" name="const_mod" value="', CONSTMODS, '"/>', collapse = "\n")
-# } else {
-#   ""
-# }
-# 
-# # Create HTML inputs for variable modifications (VARMODS)
-# var_mods_html <- if (length(CONSTMODS) > 0) {
-#   paste0('<input type="hidden" name="mod_AA" value="', CONSTMODS, '"/>', collapse = "\n")
-# } else {
-#   ""
-# }
-
 
 # =================================================== #
 # ===== MAIN FUNCTION =============================== #

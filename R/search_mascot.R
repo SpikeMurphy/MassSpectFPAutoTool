@@ -1,21 +1,4 @@
 # TODO: go through website HTML and orter arguments and local html
-# TODO: CONSTMODS/VARMODS multiple? -> turn to c()?
-# TODO: ->
-
-# Create HTML inputs for contant modifications (CONSTMODS) ->
-# const_mods_html <- if (length(VARMODS) > 0) {
-#   paste0('<input type="hidden" name="const_mod" value="', CONSTMODS, '"/>', collapse = "\n")
-# } else {
-#   ""
-# }
-# 
-# # Create HTML inputs for variable modifications (VARMODS)
-# var_mods_html <- if (length(CONSTMODS) > 0) {
-#   paste0('<input type="hidden" name="mod_AA" value="', CONSTMODS, '"/>', collapse = "\n")
-# } else {
-#   ""
-# }
-
 
 # =================================================== #
 # ===== MAIN FUNCTION =============================== #
@@ -195,17 +178,17 @@ mascot_check_mods <- function(CONSTMODS, VARMODS){
 
 mascot_check_tolerance <- function(MASS, CHARGE, TOL, TOLU){
   if (MASS != "Monoisotopic"){
-    stop("Argument `MASS` should be 'Monoisotopic'")
+    stop("Argument `MASS` should be 'Monoisotopic'.")
   } else if (CHARGE != "1+") {
-    stop("Argument `CHARGE` should be '1+'")
+    stop("Argument `CHARGE` should be '1+'.")
   } else if (length(TOL) != 1){
-    stop("Argument `TOL` should contains one floating point value")
+    stop("Argument `TOL` should contains one floating point value.")
   } else if (!is.numeric(TOL)) {
-    stop("Argument `TOL` should be a floating point value")
+    stop("Argument `TOL` should be a floating point value.")
   } else if (TOL < 0) {
-    stop("Argument `TOL` should be a positive floating point value")
+    stop("Argument `TOL` should be a positive floating point value.")
   } else if (length(TOLU) != 1){
-    stop("Argument `TOLU` should contains one unit")
+    stop("Argument `TOLU` should contains one unit.")
   } else if (!(TOLU %in% c("Da", "ppm", "mmu", "%"))) {
     stop("Argument `TOLU` should be an integer.")
   }

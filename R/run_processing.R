@@ -456,16 +456,67 @@ run_processing <- function (FILE, CLEAVAGE = "Trypsin", KERATIN = TRUE, TAG = NU
 # =================================================== #
 
 processing_check_file <- function(FILE){
+  if (length(FILE) != 1){
+    stop("Argument `FILE` should consist of one file path.")
+  }
+    
+  # check path
+  if (!file.exists(FILE)){
+    stop("Argument `FILE` indicates a non existing file.")
+  }
   
+  # supported extensions
+  supported <- c("mzXML", "mzML", "imzML")
+  
+  # get extenstion
+  split <- strsplit(FILE, "\\.")
+  extension <- split[[1]][length(split[[1]])]
+  
+  # check extension
+  if (!(extension %in% supported)){
+    stop("Argument `FILE` has an unsupported file extension.")
+  }
 }
 
 
 processing_check_cleavage <- function(CLEAVAGE){
+  enzymes <- c("Trypsin")
   
+  if (length(CLEAVAGE) != 1){
+    warning("Argument `CLEAVAGE` should consist of one restriction enzyme.")
+  } else if(!(CLEAVAGE %in% enzymes)){
+    warning("Argument `CLEAVAGE` contains unexpected enzyme.")
+  }
 }
 
 
 processing_check_contaminants <- function(KERATIN, TAG, EXCLUDE){
+  # KERATIN
+  if (length(KERATIN) != 1){
+    warning("Argument `KERATIN` should contain one logical argument.")
+  } else if (is.na(KERATIN)){
+    warning("Argument `KERATIN` should be 'TRUE' or 'FALSE'.")
+  }else if (KERATIN != TRUE && KERATIN != FALSE){
+    warning("Argument `KERATIN` should be 'TRUE' or 'FALSE'.")
+  }
+    
+  # TAG
+  tags <- c("GFP", "RFP")
+  
+  if (!is.null(TAG)){
+    if (length(TAG) != 1){
+      warning("Argument `TAG` should consist of one restriction enzyme.")
+    } else if(!(TAG %in% tags)){
+      warning("Argument `TAG` contains unexpected enzyme. Try to generate a peak list for your tag with `search_msdigest()` and include the peaklist in the argument `EXCLUDE`")
+    }
+  }
+  
+  # EXCLUDE
+  if (length(EXCLUDE) != 0){
+    if (!is.numeric(EXCLUDE)){
+      warning("Argument `EXCLUDE` should be a list of m/z values (peaks).")
+    }
+  }
   
 }
 
